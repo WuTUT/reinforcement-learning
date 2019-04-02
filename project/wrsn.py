@@ -21,12 +21,37 @@ def funPh(distance):
     Ph=[1,1,2,2,3]
     return Ph[distance]    
 
-def calculate_reward():
-    return reward
 
-def calculate_incbattery()
-def calculate_trans_P():
-    return 
+def calculate_transprob(sensor_node,selected,switch=None):
+    if selected==True:
+        #BH
+        if (switch!=0 and switch!=1):
+            raise Exception("Invalid switch",switch)
+        if switch==0:
+            B[sensor_node]=min(B[sensor_node]+funEh(H[sensor_node]),battle_level)
+        else:
+            if funPh(H[sensor_node])<B[sensor_node]:
+                B[sensor_node]=B[sensor_node]-funPh(H[sensor_node])
+                D[sensor_node]=max(D[sensor_node]-1,0)
+            D[sensor_node]=D[sensor_node]+1 if data_prob[sensor_node]>np.random.uniform(0,1) else D[sensor_node]
+            if D[sensor_node]>queue_len:
+                D[sensor_node]=queue_len
+                data_overflow=-1
+            else:
+                data_overflow=0
+   
+    else:
+        D[sensor_node]=D[sensor_node]+1 if data_prob[sensor_node]>np.random.uniform(0,1) else D[sensor_node]
+        if D[sensor_node]>queue_len:
+            D[sensor_node]=queue_len
+            data_overflow=-1
+        else:
+            data_overflow=0
+
+    return data_overflow
+
+
+
 
 #Sensor Node select Env
 class nsEnv(gym.Env):
@@ -39,6 +64,11 @@ class nsEnv(gym.Env):
         done=False
         reward=0.0
         #TO DO
+        for i in range(sensor_node):
+            if i != action:
+                reward += calculate_transprob(i,False)
+            
+
     
         return 
     def _get_obs(self):
