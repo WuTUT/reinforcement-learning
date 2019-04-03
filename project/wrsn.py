@@ -6,7 +6,6 @@ from gym import spaces
 
 queue_len=20
 battle_level=40
-
 distance_level=5
 sensor_node=10
 B=np.random.randint(1,battle_level,sensor_node)
@@ -57,7 +56,11 @@ def calculate_transprob(sensor_node,selected,switch=None):
 class nsEnv(gym.Env):
     def __init__(self,sensor_node):
         self.action_space = spaces.Discrete(sensor_node)
-        self.observation_space = spaces.Tuple((((spaces.Discrete(battle_level+1),spaces.Discrete(queue_len+1)),)*sensor_node))
+
+        self.lowstate=np.array([0,0,0])
+        self.highstate=np.array([battle_level-1,queue_len-1,distance_level-1])
+
+        self.observation_space = spaces.Box(low=self.lowstate,high=self.highstate,shape=(sensor_node,3))
         
 
     def step(self,action):
@@ -67,12 +70,17 @@ class nsEnv(gym.Env):
         for i in range(sensor_node):
             if i != action:
                 reward += calculate_transprob(i,False)
-            
+        for i in range(sensor_node):
+            if B[i]==0:
+                done = True
+                break
+        
+
 
     
-        return 
+        return self._get_obs(),reward,done,{}
     def _get_obs(self):
-
+        return 
     def reset():
 
         return self._get_obs()
